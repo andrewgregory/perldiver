@@ -7,21 +7,19 @@ use parent 'PerlDiver';
 use JSON;
 use LWP::Simple;
 
-sub new {
-    my ( $class, %self ) = @_;
-    bless \%self, $class;
-}
+use URI::Escape qw(uri_escape);
 
 sub pod {
     my ( $self, $target ) = @_;
-    my $query_url
-      = sprintf( '%s/pod/%s?content-type=text/x-pod', $self->{url}, $target );
-    return get($query_url)
-      or die "Could not retrieve documentation for module '$target'.\n";
+    my $query_url = sprintf( '%s/pod/%s?content-type=text/x-pod',
+        $self->{url}, uri_escape($target) );
+    my $pod = get($query_url) or return;
+    return $pod;
 }
 
 sub search {
-    my ( $self, $query ) = @_;
+    my ( $self, @targets ) = @_;
+    my $query = uri_escape( join( ' ', map {qq("$_")} @targets ) );
     my $query_url
       = sprintf( '%s/release/_search?size=10&q=status:latest AND %s',
         $self->{url}, $query );

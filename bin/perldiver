@@ -9,8 +9,6 @@ use autodie;
 use Pod::Man;
 use Getopt::Long qw(:config autohelp autoversion);
 
-use URI::Escape qw(uri_escape);
-
 use PerlDiver;
 
 my %opts = (
@@ -22,13 +20,19 @@ my %opts = (
 
 GetOptions( \%opts, 'url=s', 'pager=s', 'search', 'pod' );
 
-my $be = PerlDiver::MetaCPAN->new( url => $opts{url} );
-
 my @targets = @ARGV;
+
+my @backends = ( PerlDiver::Local->new(),
+    PerlDiver::MetaCPAN->new( url => $opts{url} ), );
 
 if ( $opts{pod} ) {
     foreach my $target (@targets) {
-        my $pod = $be->pod($target);
+        my $pod;
+        foreach my $be (@backends) {
+            $pod = eval { $be->pod($target) } and last;
+        }
+        warn "Could not locate pod for '$target'.\n" and next
+          unless $pod;
         my $parser = Pod::Man->new( name => $target, section => 3 );
         open PAGER, '|-', 'man', '-l', '-';
         $parser->output_fh(*PAGER);
@@ -37,8 +41,13 @@ if ( $opts{pod} ) {
     }
 }
 elsif ( $opts{search} ) {
-    my $query = uri_escape( join( ' ', map {qq("$_")} @targets ) );
-    foreach my $result ( $be->search($query) ) {
+    my @results;
+    foreach my $be (@backends) {
+        push @results, $be->search(@targets);
+    }
+    warn "Search returned no results (@targets)."
+      unless @results;
+    foreach my $result (@results) {
         print "$result->{distribution} - $result->{abstract}\n";
     }
 }
