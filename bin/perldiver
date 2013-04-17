@@ -67,7 +67,7 @@ perldiver
 
 =head1 SYNOPSIS
 
- perldiver [--pod|--search|--function] <PageName|ModuleName|ProgName>
+ perldiver [--pod|--search|--function] <PageName|ModuleName|ProgName|FileName>
 
 =head1 DESCRIPTION
 

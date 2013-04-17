@@ -59,7 +59,7 @@ sub pod {
     else {
         my $file
           = Pod::Find::pod_where(
-            { -inc => 1, -dirs => ['/usr/bin/vendor_perl/'] }, $target )
+            { -inc => 1, -dirs => ['.', '/usr/bin/vendor_perl/'] }, $target )
           or return;
         $pod = read_file($file);
     }
