@@ -14,8 +14,8 @@ use PerlDiver;
 my %opts = (
     url    => 'http://api.metacpan.org/v0',
     pager  => $ENV{PAGER},
-    search => 1,
-    pod    => 0
+    search => 0,
+    pod    => 1,
 );
 
 GetOptions( \%opts, 'url=s', 'pager=s', 'search', 'pod' );
@@ -25,7 +25,18 @@ my @targets = @ARGV;
 my @backends = ( PerlDiver::Local->new(),
     PerlDiver::MetaCPAN->new( url => $opts{url} ), );
 
-if ( $opts{pod} ) {
+if ( $opts{search} ) {
+    my @results;
+    foreach my $be (@backends) {
+        push @results, $be->search(@targets);
+    }
+    warn "Search returned no results (@targets)."
+      unless @results;
+    foreach my $result (@results) {
+        print "$result->{distribution} - $result->{abstract}\n";
+    }
+}
+elsif ( $opts{pod} ) {
     foreach my $target (@targets) {
         my $pod;
         foreach my $be (@backends) {
@@ -38,17 +49,6 @@ if ( $opts{pod} ) {
         $parser->output_fh(*PAGER);
         $parser->parse_string_document($pod);
         close PAGER;
-    }
-}
-elsif ( $opts{search} ) {
-    my @results;
-    foreach my $be (@backends) {
-        push @results, $be->search(@targets);
-    }
-    warn "Search returned no results (@targets)."
-      unless @results;
-    foreach my $result (@results) {
-        print "$result->{distribution} - $result->{abstract}\n";
     }
 }
 
