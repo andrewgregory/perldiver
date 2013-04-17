@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+our $VERSION = '0.01';
+
+use autodie;
+use Pod::Man;
+use Getopt::Long qw(:config autohelp autoversion);
+
+use URI::Escape qw(uri_escape);
+
+use PerlDiver;
+
+my %opts = (
+    url    => 'http://api.metacpan.org/v0',
+    pager  => $ENV{PAGER},
+    search => 1,
+    pod    => 0
+);
+
+GetOptions( \%opts, 'url=s', 'pager=s', 'search', 'pod' );
+
+my $be = PerlDiver::MetaCPAN->new( url => $opts{url} );
+
+my @targets = @ARGV;
+
+if ( $opts{pod} ) {
+    foreach my $target (@targets) {
+        my $pod = $be->pod($target);
+        my $parser = Pod::Man->new( name => $target, section => 3 );
+        open PAGER, '|-', 'man', '-l', '-';
+        $parser->output_fh(*PAGER);
+        $parser->parse_string_document($pod);
+        close PAGER;
+    }
+}
+elsif ( $opts{search} ) {
+    my $query = uri_escape( join( ' ', map {qq("$_")} @targets ) );
+    foreach my $result ( $be->search($query) ) {
+        print "$result->{distribution} - $result->{abstract}\n";
+    }
+}
+
+__END__
+
+=head1 NAME
+
+perldiver
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION

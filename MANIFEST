@@ -1,0 +1,10 @@
+Build.PL
+MANIFEST			This list of files
+README
+bin/perldiver
+lib/PerlDiver.pm
+lib/PerlDiver/MetaCPAN.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
