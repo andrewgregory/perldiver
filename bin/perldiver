@@ -22,7 +22,8 @@ my %opts = (
 );
 
 GetOptions( \%opts, 'url=s', 'pager=s', 'search', 'pod', 'local', 'function|f',
-    'variable|v' );
+    'variable|v' )
+  or Getopt::Long::HelpMessage(255);
 
 my @targets = @ARGV
   or Getopt::Long::HelpMessage(
