@@ -17,16 +17,21 @@ my %opts = (
     search   => 0,
     pod      => 1,
     function => 0,
+    variable => 0,
+    local    => 0,
 );
 
-GetOptions( \%opts, 'url=s', 'pager=s', 'search', 'pod', 'function|f' );
+GetOptions( \%opts, 'url=s', 'pager=s', 'search', 'pod', 'local', 'function|f',
+    'variable|v' );
 
 my @targets = @ARGV
   or Getopt::Long::HelpMessage(
     { -msg => 'No arguments provided.', -exitval => 255 } );
 
+$opts{local} = 1 if $opts{variable} or $opts{function};
+
 my @backends
-  = $opts{function}
+  = $opts{local}
   ? ( PerlDiver::Local->new() )
   : ( PerlDiver::Local->new(), PerlDiver::MetaCPAN->new( url => $opts{url} ) );
 
@@ -45,9 +50,7 @@ elsif ( $opts{pod} ) {
     foreach my $target (@targets) {
         my $pod;
         foreach my $be (@backends) {
-            $pod
-              = eval { $be->pod( $target, { function => $opts{function} } ) }
-              and last;
+            $pod = eval { $be->pod( $target, \%opts ) } and last;
         }
         warn "Could not locate pod for '$target'.\n" and next
           unless $pod;
@@ -88,5 +91,14 @@ Search for modules that match the provided targets.
 
 Treat arguments as built-in perl functions.  Equivalent to C<perldoc -f
 <function>>.
+
+=item B<--variable>, B<-v>
+
+Treat arguments as built-in perl variable.  Equivalent to C<perldoc -v
+<perlvar>>.
+
+=item B<--local>
+
+Do not search remote repositories.
 
 =back
