@@ -103,4 +103,15 @@ sub search {
     return;
 }
 
+sub source {
+    my ( $self, $target ) = @_;
+    my $file
+      = Pod::Find::pod_where(
+        { -inc => 1, -dirs => [ '.', '/usr/bin/vendor_perl/' ] }, $target )
+      or return;
+    my $source = read_file($file);
+    my $ft = ( $file =~ /[.]pod$/i ) ? 'pod' : 'perl';
+    return ( $source, $ft );
+}
+
 1;

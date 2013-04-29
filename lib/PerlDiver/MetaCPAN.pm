@@ -31,4 +31,12 @@ sub search {
     return @results;
 }
 
+sub source {
+    my ($self, $target) = @_;
+    my $query_url = sprintf( '%s/source/%s',
+        $self->{url}, uri_escape($target) );
+    my $source = get($query_url) or return;
+    return ($source, 'perl');
+}
+
 1;

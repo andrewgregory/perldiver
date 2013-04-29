@@ -16,13 +16,14 @@ my %opts = (
     pager    => $ENV{PAGER},
     search   => 0,
     pod      => 1,
+    source   => 0,
     function => 0,
     variable => 0,
     local    => 0,
 );
 
 GetOptions( \%opts, 'url=s', 'pager=s', 'search', 'pod', 'local', 'function|f',
-    'variable|v' )
+    'variable|v', 'source' )
   or Getopt::Long::HelpMessage(255);
 
 my @targets = @ARGV
@@ -45,6 +46,21 @@ if ( $opts{search} ) {
       unless @results;
     foreach my $result (@results) {
         print "$result->{distribution} - $result->{abstract}\n";
+    }
+}
+elsif ( $opts{source} ) {
+    foreach my $target (@targets) {
+        my ( $source, $ft );
+        foreach my $be (@backends) {
+            ( $source, $ft )
+              = eval { $be->source( $target, \%opts ) } and last;
+        }
+        warn "Could not locate source for '$target'.\n" and next
+          unless $source;
+        my $parser = Pod::Man->new( name => $target, section => 3 );
+        open PAGER, '|-', 'vim', "+set ft=$ft", '-R', '-';
+        print PAGER $source;
+        close PAGER;
     }
 }
 elsif ( $opts{pod} ) {
