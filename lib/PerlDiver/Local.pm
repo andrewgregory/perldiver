@@ -1,8 +1,8 @@
+package PerlDiver::Local;
+use parent 'PerlDiver::Base';
+
 use strict;
 use warnings;
-
-package PerlDiver::Local;
-use parent 'PerlDiver';
 
 use File::Slurp;
 use Pod::Find;
@@ -38,6 +38,7 @@ sub _get_pod_section {
         }
         elsif ( $line =~ $target_re ) {
             $in_section = 1;
+
             # add any previous aliases
             for ( my $i = $lineno - 1; $i >= 1; $i-- ) {
                 if ( $lines[ $i - 1 ] =~ /^(\s*$|=item\s)/ ) {
@@ -48,6 +49,7 @@ sub _get_pod_section {
                 }
             }
             $pod .= $line;
+
             # add any following aliases
             for ( $lineno++; $lineno <= @lines; $lineno++ ) {
                 if ( $lines[ $lineno - 1 ] =~ /^(\s*$|=item\s)/ ) {
@@ -83,7 +85,7 @@ sub pod {
     }
     elsif ( $opts->{variable} ) {
         my $file = Pod::Find::pod_where( { -inc => 1 }, 'perlvar' );
-        $pod = $self->_get_pod_section($file, $target);
+        $pod = $self->_get_pod_section( $file, $target );
     }
     else {
         my $file

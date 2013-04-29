@@ -12,9 +12,4 @@ PerlDiver - command line interface for browsing perl modules
 
 =cut
 
-sub new {
-    my ( $class, %self ) = @_;
-    bless \%self, $class;
-}
-
 1;

@@ -1,8 +1,8 @@
+package PerlDiver::MetaCPAN;
+use parent 'PerlDiver::Base';
+
 use strict;
 use warnings;
-
-package PerlDiver::MetaCPAN;
-use parent 'PerlDiver';
 
 use JSON;
 use LWP::Simple;
