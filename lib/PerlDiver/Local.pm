@@ -98,9 +98,44 @@ sub pod {
 }
 
 sub search {
-    my ( $self, $query ) = @_;
-    Carp::carp("Search not implemented yet");
-    return;
+    my ( $self, @targets ) = @_;
+    my %pods = Pod::Find::pod_find( { -script => 1, -inc => 1 } );
+    my %matches;
+    # FIXME: this is super ugly, refactor it
+    foreach my $file ( keys %pods ) {
+        my $name = $pods{$file};
+        my ( $line, $abstract ) = ( '', '' );
+        open my $fh, '<', $file;
+        while ( $line = <$fh> ) {
+            if ( $line =~ /^=head1\s+NAME/ ) {
+                while ( $line = <$fh> ) {
+                    next if $line =~ /^\s*$/;    # skip empty lines
+                    if ( $line =~ /^\s*\Q$name\E(?:\s|-)*(.*)/i ) {
+                        $abstract = $1;
+                    }
+                    last;
+                }
+                last;
+            }
+        }
+        close $fh;
+        $line = "$name - $abstract";
+        my $count = 0;
+        foreach my $target (@targets) {
+            # this weighting gives decent results in empirical tests
+            $count += 1 while ( $line =~ /$target/g );
+            $count += 2 while ( $name =~ /\b$target\b/g );
+            $count *= 2 if lc $name eq lc $target
+        }
+        $matches{$name} = {
+            score        => $count,
+            distribution => $name,
+            abstract     => $abstract
+        };
+    }
+    return
+      grep { $_->{score} > 0 }
+      ( sort { $b->{score} <=> $a->{score} } values %matches );
 }
 
 sub source {
