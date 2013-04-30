@@ -8,7 +8,7 @@ use PerlDiver::Local;
 
 =head1 NAME
 
-PerlDiver - command line interface for browsing perl modules
+PerlDiver - tool to find and browse perl modules and their documentation
 
 =cut
 
