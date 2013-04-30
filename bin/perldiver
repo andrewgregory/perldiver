@@ -100,6 +100,7 @@ perldiver - CLI tool to find and browse perl modules and their documentation
  perldiver --search <Target>...
  perldiver --function <BuiltinFunctionName>
  perldiver --variable <BuiltinVariableName>
+ perldiver (--help|--version)
 
 =head1 DESCRIPTION
 
