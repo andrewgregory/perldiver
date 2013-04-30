@@ -4,8 +4,11 @@ use parent 'PerlDiver::Base';
 use strict;
 use warnings;
 
+use Config;
 use File::Slurp;
 use Pod::Find;
+
+my @scriptdirs = @Config::Config{qw(scriptdir sitescript vendorscript)};
 
 # Extract a pod section from official documentation
 
@@ -90,7 +93,8 @@ sub pod {
     else {
         my $file
           = Pod::Find::pod_where(
-            { -inc => 1, -dirs => [ '.', '/usr/bin/vendor_perl/' ] }, $target )
+            { -inc => 1, -dirs => [ '.', @scriptdirs ] },
+            $target )
           or return;
         $pod = read_file($file);
     }
@@ -142,7 +146,7 @@ sub source {
     my ( $self, $target ) = @_;
     my $file
       = Pod::Find::pod_where(
-        { -inc => 1, -dirs => [ '.', '/usr/bin/vendor_perl/' ] }, $target )
+        { -inc => 1, -dirs => [ '.', @scriptdirs ] }, $target )
       or return;
     my $source = read_file($file);
     my $ft = ( $file =~ /[.]pod$/i ) ? 'pod' : 'perl';
