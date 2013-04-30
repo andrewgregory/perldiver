@@ -105,6 +105,7 @@ sub search {
     my ( $self, @targets ) = @_;
     my %pods = Pod::Find::pod_find( { -script => 1, -inc => 1 } );
     my %matches;
+
     # FIXME: this is super ugly, refactor it
     foreach my $file ( keys %pods ) {
         my $name = $pods{$file};
@@ -126,10 +127,11 @@ sub search {
         $line = "$name - $abstract";
         my $count = 0;
         foreach my $target (@targets) {
+
             # this weighting gives decent results in empirical tests
             $count += 1 while ( $line =~ /$target/g );
             $count += 2 while ( $name =~ /\b$target\b/g );
-            $count *= 2 if lc $name eq lc $target
+            $count *= 2 if lc $name eq lc $target;
         }
         $matches{$name} = {
             score        => $count,
@@ -149,7 +151,7 @@ sub source {
         { -inc => 1, -dirs => [ '.', @scriptdirs ] }, $target )
       or return;
     my $source = read_file($file);
-    my $ft = ( $file =~ /[.]pod$/i ) ? 'pod' : 'perl';
+    my $ft = ( $file =~ /[.]pod$/i ) ? 'pod' : 'pl';
     return ( $source, $ft );
 }
 

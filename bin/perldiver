@@ -7,6 +7,7 @@ our $VERSION = '0.01';
 
 use autodie;
 use Pod::Man;
+use File::Temp;
 use Getopt::Long qw(:config autohelp autoversion);
 
 use PerlDiver;
@@ -22,9 +23,11 @@ my %opts = (
     local    => 0,
 );
 
-GetOptions( \%opts, 'url=s', 'pager=s', 'search', 'pod', 'local', 'function|f',
-    'variable|v', 'source' )
-  or Getopt::Long::HelpMessage(255);
+GetOptions(
+    \%opts, 'url=s', 'pager=s',    'search',
+    'pod',  'local', 'function|f', 'variable|v',
+    'source'
+) or Getopt::Long::HelpMessage(255);
 
 my @targets = @ARGV
   or Getopt::Long::HelpMessage(
@@ -57,10 +60,15 @@ elsif ( $opts{source} ) {
         }
         warn "Could not locate source for '$target'.\n" and next
           unless $source;
-        my $parser = Pod::Man->new( name => $target, section => 3 );
-        open PAGER, '|-', 'vim', "+set ft=$ft", '-R', '-';
-        print PAGER $source;
-        close PAGER;
+        if ( -t STDOUT ) {
+            my $viewer = ( $ENV{EDITOR} or $ENV{PAGER} or 'vim -R' );
+            my $tmp = File::Temp->new( SUFFIX => ".$ft" );
+            print $tmp $source;
+            system( $viewer, $tmp );
+        }
+        else {
+            print $source;
+        }
     }
 }
 elsif ( $opts{pod} ) {
