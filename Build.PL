@@ -1,3 +1,8 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
 use Module::Build;
 
 my $build = Module::Build->new(
@@ -14,6 +19,7 @@ my $build = Module::Build->new(
     tap_harness_args => {
         lib => 'lib',
     },
+    license => 'mit',
 );
 
 $build->create_build_script();
