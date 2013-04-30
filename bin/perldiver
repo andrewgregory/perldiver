@@ -42,7 +42,7 @@ if ( $opts{search} ) {
     foreach my $be (@backends) {
         push @results, $be->search(@targets);
     }
-    warn "Search returned no results (@targets)."
+    warn "Search returned no results (@targets).\n"
       unless @results;
     foreach my $result (@results) {
         print "$result->{distribution} - $result->{abstract}\n";
