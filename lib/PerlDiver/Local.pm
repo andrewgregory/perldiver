@@ -4,6 +4,8 @@ use parent 'PerlDiver::Base';
 use strict;
 use warnings;
 
+our $VERSION = '0.1';
+
 use Config;
 use File::Slurp;
 use Pod::Find;

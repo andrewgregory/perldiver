@@ -4,6 +4,8 @@ use parent 'PerlDiver::Base';
 use strict;
 use warnings;
 
+our $VERSION = '0.1';
+
 use JSON;
 use LWP::Simple;
 
