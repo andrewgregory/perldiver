@@ -13,20 +13,19 @@ use Getopt::Long qw(:config autohelp autoversion);
 use PerlDiver;
 
 my %opts = (
-    url      => 'http://api.metacpan.org/v0',
-    pager    => $ENV{PAGER} || 'less',
-    editor   => $ENV{EDITOR} || $ENV{PAGER} || 'vim',
     search   => 0,
     pod      => 1,
     source   => 0,
     function => 0,
     variable => 0,
     local    => 0,
+    pager    => $ENV{PAGER} || 'less',
+    editor   => $ENV{EDITOR} || $ENV{PAGER} || 'vim',
 );
 
 GetOptions(
-    \%opts, 'url=s', 'pager=s',    'search',
-    'pod',  'local', 'function|f', 'variable|v',
+    \%opts, 'pager=s', 'editor=s',   'search',
+    'pod',  'local',   'function|f', 'variable|v',
     'source'
 ) or Getopt::Long::HelpMessage(255);
 
@@ -39,7 +38,7 @@ $opts{local} = 1 if $opts{variable} or $opts{function};
 my @backends
   = $opts{local}
   ? ( PerlDiver::Local->new() )
-  : ( PerlDiver::Local->new(), PerlDiver::MetaCPAN->new( url => $opts{url} ) );
+  : ( PerlDiver::Local->new(), PerlDiver::MetaCPAN->new() );
 
 if ( $opts{search} ) {
     my @results;
