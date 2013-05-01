@@ -9,6 +9,7 @@ use File::Slurp;
 use Pod::Find;
 
 my @scriptdirs = @Config::Config{qw(scriptdir sitescript vendorscript)};
+my @searchdirs = ( '.', @scriptdirs );
 
 # Extract a pod section from official documentation
 
@@ -76,7 +77,8 @@ sub _get_pod_section {
 
 sub _builtin_function_pod {
     my ( $self, $function ) = @_;
-    my $file = Pod::Find::pod_where( { -inc => 1 }, 'perlfunc' );
+    my $file = Pod::Find::pod_where( { -inc => 1, -dirs => \@searchdirs },
+        'perlfunc' );
     return $self->_get_pod_section( $file, $function );
 }
 
@@ -87,13 +89,13 @@ sub pod {
         $pod = $self->_builtin_function_pod($target);
     }
     elsif ( $opts->{variable} ) {
-        my $file = Pod::Find::pod_where( { -inc => 1 }, 'perlvar' );
+        my $file = Pod::Find::pod_where( { -inc => 1, -dirs => \@searchdirs },
+            'perlvar' );
         $pod = $self->_get_pod_section( $file, $target );
     }
     else {
         my $file
-          = Pod::Find::pod_where(
-            { -inc => 1, -dirs => [ '.', @scriptdirs ] },
+          = Pod::Find::pod_where( { -inc => 1, -dirs => \@searchdirs },
             $target )
           or return;
         $pod = read_file($file);
@@ -103,7 +105,7 @@ sub pod {
 
 sub search {
     my ( $self, @targets ) = @_;
-    my %pods = Pod::Find::pod_find( { -script => 1, -inc => 1 } );
+    my %pods = Pod::Find::pod_find( { -script => 1, -inc => 1 }, @searchdirs );
     my %matches;
 
     # FIXME: this is super ugly, refactor it
@@ -147,8 +149,7 @@ sub search {
 sub source {
     my ( $self, $target ) = @_;
     my $file
-      = Pod::Find::pod_where(
-        { -inc => 1, -dirs => [ '.', @scriptdirs ] }, $target )
+      = Pod::Find::pod_where( { -inc => 1, -dirs => \@searchdirs }, $target )
       or return;
     my $source = read_file($file);
     my $ft = ( $file =~ /[.]pod$/i ) ? 'pod' : 'pl';
