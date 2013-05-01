@@ -129,12 +129,12 @@ Retrieve and display the source code for the supplied page, module, or program.
 
 Search for modules that match the provided targets.
 
-=item B<--function>, B<-f>
+=item B<-f>, B<--function>
 
 Treat arguments as built-in perl functions.  Equivalent to C<< perldoc -f
 <function> >>.  Implies B<--local>.
 
-=item B<--variable>, B<-v>
+=item B<-v>, B<--variable>
 
 Treat arguments as built-in perl variable.  Equivalent to C<< perldoc -v
 <perlvar> >>.  Implies B<--local>.
@@ -143,11 +143,7 @@ Treat arguments as built-in perl variable.  Equivalent to C<< perldoc -v
 
 Do not search remote repositories.
 
-=item B<--pager>
-
-Program to use for viewing rendered manpages.
-
-=item B<--editor>
+=item B<--editor>=I<editor>
 
 Program to use for viewing source code.
 
