@@ -20,8 +20,8 @@ sub _get_pod_section {
     my $pod   = '';
     my @lines = read_file($file);
     my ( $in_section, $depth ) = ( 0, 0 );
-    my $target_re     = qr/^=item(\s+\Q$section\E)/;
-    my $target_end_re = qr/^=item(?!\s+\Q$section\E)/;
+    my $target_re     = qr/^=item\s+\Q$section\E\b/;
+    my $target_end_re = qr/^=item(?!\s+\Q$section\E\b)/;
 
     for ( my $lineno = 1; $lineno <= @lines; $lineno++ ) {
         my $line = $lines[ $lineno - 1 ];
