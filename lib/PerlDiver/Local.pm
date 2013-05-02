@@ -107,7 +107,7 @@ sub pod {
 
 sub search {
     my ( $self, @targets ) = @_;
-    my %pods = Pod::Find::pod_find( { -script => 1, -inc => 1 }, @searchdirs );
+    my %pods = Pod::Find::pod_find( { -script => 1, -inc => 1 }, @scriptdirs );
     my %matches;
 
     # FIXME: this is super ugly, refactor it
