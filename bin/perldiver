@@ -9,6 +9,7 @@ use autodie;
 use Pod::Man;
 use File::Temp;
 use Getopt::Long qw(:config autohelp autoversion);
+use Pod::Usage;
 
 use PerlDiver;
 
@@ -27,11 +28,10 @@ GetOptions(
     \%opts, 'pager=s', 'editor=s',   'search',
     'pod',  'local',   'function|f', 'variable|v',
     'source'
-) or Getopt::Long::HelpMessage(255);
+) or pod2usage( -exitval => 1 );
 
 my @targets = @ARGV
-  or Getopt::Long::HelpMessage(
-    { -msg => 'No arguments provided.', -exitval => 255 } );
+  or pod2usage( -msg => 'error: no arguments provided', -exitval => 1 );
 
 $opts{local} = 1 if $opts{variable} or $opts{function};
 
