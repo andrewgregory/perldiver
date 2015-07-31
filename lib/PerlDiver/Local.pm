@@ -79,7 +79,7 @@ sub _get_pod_section {
 
 sub _builtin_function_pod {
     my ( $self, $function ) = @_;
-    my $file = Pod::Find::pod_where( { -inc => 1, -dirs => \@searchdirs },
+    my $file = pod_where( { -inc => 1, -dirs => \@searchdirs },
         'perlfunc' );
     return $self->_get_pod_section( $file, $function );
 }
@@ -91,13 +91,13 @@ sub pod {
         $pod = $self->_builtin_function_pod($target);
     }
     elsif ( $opts->{variable} ) {
-        my $file = Pod::Find::pod_where( { -inc => 1, -dirs => \@searchdirs },
+        my $file = pod_where( { -inc => 1, -dirs => \@searchdirs },
             'perlvar' );
         $pod = $self->_get_pod_section( $file, $target );
     }
     else {
         my $file
-          = Pod::Find::pod_where( { -inc => 1, -dirs => \@searchdirs },
+          = pod_where( { -inc => 1, -dirs => \@searchdirs },
             $target )
           or return;
         $pod = read_file($file);
@@ -107,7 +107,7 @@ sub pod {
 
 sub search {
     my ( $self, @targets ) = @_;
-    my %pods = Pod::Find::pod_find( { -script => 1, -inc => 1 }, @scriptdirs );
+    my %pods = pod_find( { -script => 1, -inc => 1 }, @scriptdirs );
     my %matches;
 
     # FIXME: this is super ugly, refactor it
@@ -151,11 +151,21 @@ sub search {
 sub source {
     my ( $self, $target ) = @_;
     my $file
-      = Pod::Find::pod_where( { -inc => 1, -dirs => \@searchdirs }, $target )
+      = pod_where( { -inc => 1, -dirs => \@searchdirs }, $target )
       or return;
     my $source = read_file($file);
     my $ft = ( $file =~ /[.]pod$/i ) ? 'pod' : 'pl';
     return ( $source, $ft );
+}
+
+sub pod_where {
+    local $SIG{__WARN__} = sub { };
+    return Pod::Find::pod_where(@_);
+}
+
+sub pod_find {
+    local $SIG{__WARN__} = sub { };
+    return Pod::Find::pod_find(@_);
 }
 
 1;
