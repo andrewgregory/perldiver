@@ -61,7 +61,7 @@ elsif ( $opts{source} ) {
           unless $source;
         if ( -t STDOUT ) {
             my $tmp = File::Temp->new( SUFFIX => ".$ft" );
-            print $tmp $source;
+            print {$tmp} $source;
             system( $opts{editor}, $tmp );
         }
         else {
