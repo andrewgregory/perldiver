@@ -79,11 +79,10 @@ elsif ( $opts{pod} ) {
         warn "Could not locate pod for '$target'.\n" and next
           unless $pod;
         my $parser = Pod::Man->new( name => $target, section => 3 );
-        if ( -t STDOUT ) {
-            open PAGER, '|-', 'man', '-l', '-';
-            $parser->output_fh(*PAGER);
+        if ( -t STDOUT and open( my $pager, '|-', 'man', '-l', '-' ) ) {
+            $parser->output_fh($pager);
             $parser->parse_string_document($pod);
-            close PAGER;
+            close $pager;
         }
         else {
             $parser->output_fh(*STDOUT);
