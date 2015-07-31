@@ -5,7 +5,6 @@ use warnings;
 
 our $VERSION = '0.1';
 
-use autodie;
 use Pod::Man;
 use File::Temp;
 use Getopt::Long qw(:config autohelp autoversion);
