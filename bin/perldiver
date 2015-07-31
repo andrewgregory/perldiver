@@ -40,15 +40,9 @@ my @backends
   : ( PerlDiver::Local->new(), PerlDiver::MetaCPAN->new() );
 
 if ( $opts{search} ) {
-    my @results;
-    foreach my $be (@backends) {
-        push @results, $be->search(@targets);
-    }
-    warn "Search returned no results (@targets).\n"
-      unless @results;
-    foreach my $result (@results) {
-        print "$result->{distribution} - $result->{abstract}\n";
-    }
+    my @results = map { $_->search(@targets) } @backends
+      or warn "Search returned no results (@targets).\n";
+    print "$_->{distribution} - $_->{abstract}\n" foreach @results;
 }
 elsif ( $opts{source} ) {
     foreach my $target (@targets) {
